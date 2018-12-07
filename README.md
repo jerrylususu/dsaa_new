@@ -1,12 +1,16 @@
 # Nekonull's DSAA
 
-Codes are in each folder, arranged by lab number. The naming format is `lab` + `lab_number` + `problem_number` + `version` + `[fast]`
+Codes are in each folder, arranged by lab number. The naming format is `lab` + `lab_number` + `problem_number` + `version` + `[fast]`.
 
 Notes are in `notes` folder.
 
 All problems are solved in Java.
 
 Problem website: http://acm.sustc.edu.cn/onlinejudge/contest.php (Choose (autumn) ones.)
+
+
+
+Yes. I know my code sucks. I'm trying to make it better, and you can help by submitting issues and point out better solutions. Much thanks!
 
 
 

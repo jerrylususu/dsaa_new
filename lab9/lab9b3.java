@@ -3,10 +3,7 @@ package lab9;
 // tried prim again
 // with out any optimization
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class lab9b3 {
     public static void main(String[] args) {
@@ -38,6 +35,32 @@ public class lab9b3 {
                 allmin = Math.min(allmin, e.weight);
             }
 
+            Arrays.sort(edges, new Comparator<MyEdge>() {
+                @Override
+                public int compare(MyEdge o1, MyEdge o2) {
+                    return o1.weight-o2.weight;
+                }
+            });
+
+            boolean[] vis = new boolean[noden];
+            int[] dist = new int[noden];
+            Arrays.fill(dist,-1);
+
+            MyEdge startedge = edges[0];
+            dist[startedge.from]=0;
+            dist[startedge.to]=0;
+            for (int i = 0; i < 2; i++) {
+                MyNode curnode = null;
+                if(i==0) curnode = nodes[startedge.from];
+                else curnode = nodes[startedge.to];
+
+                for(MyEdge e:curnode.edges){
+                    MyNode itnode = nodes[e.sum-curnode.id];
+                    if(dist[itnode.id]==-1||dist[itnode.id]>e.weight){
+                        dist[itnode.id] = e.weight;
+                    }
+                }
+            }
 
 
 

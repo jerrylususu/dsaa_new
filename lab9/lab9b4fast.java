@@ -1,13 +1,7 @@
 package lab9;
 
-// With credit to Wavator
-
-// need fast read and write
-
-// tried to use dfs?
-// no... that's not possible
-// the main problem here is the alphabetic order
-// using dfs will not satisfy this condition
+// rewrite prim
+// not helping, still wa
 
 import java.io.*;
 import java.math.*;
@@ -18,7 +12,7 @@ import java.util.*;
  * Actual solution is at the top
  * Author: Wavator
  */
-public class lab9efast {
+public class lab9b4fast {
 
     // With credit to SA Zhu
 
@@ -143,45 +137,64 @@ public class lab9efast {
         }
     }
 
+    static class MyEdge{
+        int from,to,sum,weight;
 
-    static class PQHelper{
-        int nodeid;
-        int incount;
-        int time;
-
-        public PQHelper(int nodeid, int incount, int time) {
-            this.nodeid = nodeid;
-            this.incount = incount;
-            this.time = time;
+        public MyEdge(int from, int to, int weight) {
+            this.from = from;
+            this.to = to;
+            this.sum = from + to;
+            this.weight = weight;
         }
 
         @Override
         public String toString() {
-            return "PQHelper{" +
-                    "nodeid=" + nodeid +
-                    ", incount=" + incount +
-                    ", time=" + time +
+            return "MyEdge{" +
+                    "from=" + from +
+                    ", to=" + to +
+                    ", sum=" + sum +
+                    ", weight=" + weight +
                     '}';
         }
+
+
     }
 
     static class MyNode{
         int id;
-        int visno = 0;
-        int incount = 0;
-        List<MyNode> next;
+        List<MyEdge> edges;
 
         public MyNode(int id) {
             this.id = id;
-            this.next = new ArrayList<>();
+            this.edges = new LinkedList<>();
         }
 
         @Override
         public String toString() {
             return "MyNode{" +
                     "id=" + id +
-                    ", visno=" + visno +
-                    ", incount=" + incount +
+                    ", edges=" + edges.size() +
+                    '}';
+        }
+    }
+
+    static class MyPair{
+        int id;
+        long time;
+        long weight;
+
+        public MyPair(int id, long time, long weight) {
+            this.id = id;
+            this.time = time;
+            this.weight = weight;
+        }
+
+        @Override
+        public String toString() {
+            return "MyPair{" +
+                    "id=" + id +
+                    ", time=" + time +
+                    ", weight=" + weight +
                     '}';
         }
     }
@@ -202,78 +215,87 @@ public class lab9efast {
             int totalnum = in.nextInt();
 
             while(totalnum-->0){
-                int noden = in.nextInt();
-                int edgen = in.nextInt();
-
-                MyNode[] nodes = new MyNode[noden];
-                for (int i = 0; i < noden; i++) {
+                int n=in.nextInt(), m=in.nextInt();
+                MyNode[] nodes = new MyNode[n];
+                for (int i = 0; i < n; i++) {
                     nodes[i] = new MyNode(i);
                 }
-
-                for (int i = 0; i < edgen; i++) {
-                    int from = in.nextInt()-1, to = in.nextInt()-1;
-                    nodes[from].next.add(nodes[to]);
-                    nodes[to].incount++;
+                MyEdge[] edges = new MyEdge[m];
+                for (int i = 0; i < m; i++) {
+                    int from = in.nextInt()-1, to=in.nextInt()-1,w=in.nextInt();
+                    MyEdge e = new MyEdge(from,to,w);
+                    nodes[from].edges.add(e);
+                    nodes[to].edges.add(e);
+                    edges[i]=e;
                 }
 
-                PriorityQueue<PQHelper> pq = new PriorityQueue<>(new Comparator<PQHelper>() {
+                MyEdge minedge = edges[0];
+                for (int i = 0; i < m; i++) {
+                    if(edges[i].weight<minedge.weight){
+                        minedge = edges[i];
+                    }
+                }
+
+                long sum = 0;
+                long time = 0;
+
+                long[] rectime = new long[n];
+                long[] knownmin = new long[n];
+                Arrays.fill(knownmin,-1);
+
+                PriorityQueue<MyPair> pq = new PriorityQueue<>(new Comparator<MyPair>() {
                     @Override
-                    public int compare(PQHelper o1, PQHelper o2) {
-                        if(o1.incount!=o2.incount){
-                            return o1.incount-o2.incount;
-                        } else {
-                            return o1.nodeid - o2.nodeid;
-                        }
+                    public int compare(MyPair o1, MyPair o2) {
+                        return (o1.weight==o2.weight)?0:(o1.weight<o2.weight?-1:1);
                     }
                 });
 
-                for(MyNode n:nodes){
-                    pq.add(new PQHelper(n.id,n.incount,0));
-                }
+                boolean[] vis = new boolean[n];
+                vis[minedge.from]=true;
+                vis[minedge.to]=true;
+                sum+=minedge.weight;
 
-                LinkedList<MyNode> res = new LinkedList<>();
-
-                boolean[] check = new boolean[noden];
-                int[] rectime = new int[noden];
-                int time=1;
-                boolean possiblemark = true;
-
-                while(!pq.isEmpty()){
-                    PQHelper curhelper = pq.poll();
-                    while(!pq.isEmpty()&&curhelper.time<rectime[curhelper.nodeid]){
-                        curhelper = pq.poll();
-                    }
-
-                    MyNode curnode = nodes[curhelper.nodeid];
-                    if(check[curnode.id]){
-                        continue;
-                    }
-                    check[curnode.id] = true;
-                    res.addLast(curnode);
-                    for(MyNode itnode:curnode.next){
-                        if(check[itnode.id]){
-                            possiblemark = false;
-                            break;
+                for (int i = 0; i < 2; i++) {
+                    MyNode curnode = i==0?nodes[minedge.from]:nodes[minedge.to];
+                    for(MyEdge e:curnode.edges){
+                        if(!vis[e.sum-curnode.id]&&(knownmin[e.sum-curnode.id]==-1||e.weight<knownmin[e.sum-curnode.id])) {
+                            time++;
+                            rectime[e.sum - curnode.id] = time;
+                            knownmin[e.sum-curnode.id] = e.weight;
+                            pq.add(new MyPair(e.sum - curnode.id, time, e.weight));
                         }
-                        itnode.incount--;
-                        pq.add(new PQHelper(itnode.id,itnode.incount,time));
-                        rectime[itnode.id] = time;
-                        time++;
                     }
                 }
 
-                if(!possiblemark){
-                    out.println("impossible");
-                    continue;
-                } else {
-                    for(MyNode n:res){
-                        out.print((1+n.id)+" ");
+                int linked = 2;
+
+                while(linked<n){
+                    MyPair curpair = pq.poll();
+                    while (!pq.isEmpty()&&curpair.time<rectime[curpair.id]){
+                        curpair = pq.poll();
+                    }
+
+                    MyNode curnode = nodes[curpair.id];
+                    sum+=curpair.weight;
+                    vis[curnode.id]=true;
+                    //System.out.println(curpair);
+                    linked++;
+                    for(MyEdge e:curnode.edges){
+                        if(!vis[e.sum-curnode.id]&&(knownmin[e.sum-curnode.id]==-1||e.weight<knownmin[e.sum-curnode.id])){
+                            time++;
+                            rectime[e.sum-curnode.id]=time;
+                            pq.add(new MyPair(e.sum-curnode.id,time,e.weight));
+                        }
 
                     }
-                    out.println();
                 }
+
+                out.println(sum);
 
             }
+
+
+
         }
 
     }
@@ -336,5 +358,6 @@ public class lab9efast {
             return new BigDecimal(next());
         }
     }
+
 }
 

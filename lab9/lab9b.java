@@ -42,27 +42,31 @@ public class lab9b {
 
             // run prim algorithm
             // with binary division
-            int l = allmin, r = allmax;
-            int mid = (allmin+allmax)/2;
-            long[] res = null;
-            while(l<=r){
-                mid = (l+r)/2;
-                res = calcWithLimit(mid,nodes,edges,noden,edgen);
-                if(res[1]==-1){
-                    // not ok
-                    l = mid+1;
-                } else {
-                    // ok
-                    r = mid-1;
-                }
 
-            }
-            res = calcWithLimit(mid,nodes,edges,noden,edgen);
-            while(res[1]==-1){
-                mid++;
-                res = calcWithLimit(mid,nodes,edges,noden,edgen);
-            }
+            long[] res = calc(nodes,edges,noden,edgen);
             System.out.println(res[0]);
+
+//            int l = allmin, r = allmax;
+//            int mid = (allmin+allmax)/2;
+//            long[] res = null;
+//            while(l<=r){
+//                mid = (l+r)/2;
+//                res = calcWithLimit(mid,nodes,edges,noden,edgen);
+//                if(res[1]==-1){
+//                    // not ok
+//                    l = mid+1;
+//                } else {
+//                    // ok
+//                    r = mid-1;
+//                }
+//
+//            }
+//            res = calcWithLimit(mid,nodes,edges,noden,edgen);
+//            while(res[1]==-1){
+//                mid++;
+//                res = calcWithLimit(mid,nodes,edges,noden,edgen);
+//            }
+//            System.out.println(res[0]);
         }
     }
 
@@ -132,7 +136,8 @@ public class lab9b {
         return new long[]{sum,curmax};
     }
 
-    public static int[] calc(MyNode[] nodes, MyEdge[] edges, int noden, int edgen){
+    public static long[] calc(MyNode[] nodes, MyEdge[] edges, int noden, int edgen){
+        reset(nodes, edges);
         int max = 0;
         PriorityQueue<PQHelper> pq = new PriorityQueue<>(new Comparator<PQHelper>() {
             @Override
@@ -141,17 +146,32 @@ public class lab9b {
             }
         });
         int time = 0;
-        int sum = 0;
+        long sum = 0;
         int[] recordtime = new int[noden];
         MyNode startnode = nodes[0];
-        startnode.visited = true;
-        recordtime[startnode.id] = time++;
-        for(MyEdge e:startnode.edges){
-            MyNode itnode = nodes[e.sum-startnode.id];
-            itnode.depth = e.weight;
-            pq.add(new PQHelper(itnode.id,itnode.depth,time++));
-            recordtime[itnode.id]=time-1;
+        Arrays.sort(edges, new Comparator<MyEdge>() {
+            @Override
+            public int compare(MyEdge o1, MyEdge o2) {
+                return o1.weight-o2.weight;
+            }
+        });
+        for (int i = 0; i < 2; i++) {
+            if(i==0){
+                startnode = nodes[edges[0].from];
+            } else if (i==1){
+                startnode = nodes[edges[0].to];
+            }
+            startnode.visited = true;
+            recordtime[startnode.id] = time++;
+            for(MyEdge e:startnode.edges){
+                MyNode itnode = nodes[e.sum-startnode.id];
+                itnode.depth = e.weight;
+                pq.add(new PQHelper(itnode.id,itnode.depth,time++));
+                recordtime[itnode.id]=time-1;
+            }
         }
+        sum=edges[0].weight;
+
 
         while(!pq.isEmpty()){
             PQHelper pqHelper = pq.poll();
@@ -163,7 +183,7 @@ public class lab9b {
                 continue;
             }
             curnode.visited = true;
-//            System.out.println(sum+" "+curnode);
+            System.out.println(sum+" "+curnode);
             sum += curnode.depth;
             if(curnode.depth>max){
                 max = curnode.depth;
@@ -181,7 +201,7 @@ public class lab9b {
         }
 
 //        System.out.println(sum);
-        return new int[]{sum,max};
+        return new long[]{sum,max};
     }
 
     public static void reset(MyNode[] nodes, MyEdge[] edges){

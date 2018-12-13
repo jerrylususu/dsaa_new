@@ -1,4 +1,3 @@
-package lab9;
 
 // 2 fast integrated
 // both fast write and read

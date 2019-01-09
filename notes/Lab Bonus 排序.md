@@ -14,7 +14,7 @@
 
 1 随机数的使用
 
-2 in-sute的解法
+2 in-site的解法
 
 3 分治法 二分
 
@@ -40,7 +40,7 @@
 
  
 
-来自 <<https://blog.csdn.net/no1_terminator/article/details/53024957>> 
+来自 https://blog.csdn.net/no1_terminator/article/details/53024957
 
  
 
@@ -56,7 +56,7 @@
 
  
 
-来自 <<http://www.voidcn.com/article/p-oujususd-bqg.html>> 
+来自 http://www.voidcn.com/article/p-oujususd-bqg.html
 
  
 
@@ -70,7 +70,7 @@
 
 实际：每次归并最多有一个数作为逆序对
 
-原因：如果有2个及以上的数字作为逆序对起始 那么就可以先换2再换1
+原因：如果有2个及以上的数字作为逆序对起始 那么就可以1先换2再换1
 
  
 
@@ -78,7 +78,7 @@
 
 先排序 然后二分答案
 
-如何check？滑动区间检测
+如何check？滑动区间检测 （左右两个端点差值和mid比较 如果不够大就扩大 太大了就缩小...）
 
 如何滑动区间?参考4C
 
